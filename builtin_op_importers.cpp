@@ -2097,7 +2097,7 @@ DEFINE_BUILTIN_OP_IMPORTER(Pad)
     if (ctx->getOpsetVersion() >= 11) {
         int pad;
         auto pads_tensor = inputs.at(1).weights();
-        for (int i = 0; i < pads_tensor.count(); i++) {
+        for (unsigned int i = 0; i < pads_tensor.count(); i++) {
             pad = (static_cast<int const*>(pads_tensor.values))[i];
             onnx_padding.push_back(pad);
             std::cout << "ONNX PADDING:" << pad << std::endl;

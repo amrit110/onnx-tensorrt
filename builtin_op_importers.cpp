@@ -2093,7 +2093,18 @@ DEFINE_BUILTIN_OP_IMPORTER(Pad)
     float value = attrs.get<float>("value", 0.f);
     ASSERT(mode == "constant" && value == 0 && "This version of TensorRT only supports constant 0 padding!",
         ErrorCode::kUNSUPPORTED_NODE);
-    auto onnx_padding = attrs.get<std::vector<int>>("pads");
+    std::vector<int> onnx_padding;
+    if (ctx->getOpsetVersion() >= 11) {
+        int pad;
+        auto pads_tensor = inputs.at(1).weights();
+        for (int i = 0; i < pads_tensor.count(); i++) {
+            pad = (static_cast<int const*>(pads_tensor.values))[i];
+            onnx_padding.push_back(pad);
+            std::cout << "ONNX PADDING:" << pad << std::endl;
+        }
+    } else {
+        onnx_padding = attrs.get<std::vector<int>>("pads");
+    }
     ASSERT(onnx_padding.size() == 8 && onnx_padding[0] == 0 && onnx_padding[1] == 0 && onnx_padding[4] == 0
             && onnx_padding[5] == 0
             && "This version of TensorRT only supports padding on the outer two dimensions on 4D tensors!",
